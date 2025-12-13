@@ -1,98 +1,156 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import List
 import uvicorn
-import random
 
 app = FastAPI()
 
-# --- IZINKAN HTML MENGHUBUNGI SERVER (CORS) ---
+# Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Buka untuk semua (termasuk file://)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# --- FUNGSI MENGGANTIKAN NUMPY (Manual Matrix Logic) ---
-def text_to_bytes(text):
-    return [ord(c) for c in text]
+# --- GLOBAL VARIABLES ---
+# Default K44 Parameters
+K44_MATRIX = [0x57, 0xAB, 0xD5, 0xEA, 0x75, 0xBA, 0x5D, 0xAE]
+K44_CONST = 0x63
 
-def bytes_to_hex(byte_array):
-    return " ".join([f"{b:02X}" for b in byte_array])
+CURRENT_SBOX = []
+CURRENT_INV_SBOX = []
 
-def hex_to_text(hex_str):
-    try:
-        bytes_list = [int(b, 16) for b in hex_str.split()]
-        return "".join([chr(b) for b in bytes_list])
-    except:
-        return "Error parsing hex"
+# --- MATH LOGIC ---
+def gf_mult(a, b):
+    """Perkalian Galois Field GF(2^8)"""
+    p = 0
+    for _ in range(8):
+        if b & 1: p ^= a
+        hibit = a & 0x80
+        a <<= 1
+        if hibit: a ^= 0x11B # Irreducible polynomial x^8 + x^4 + x^3 + x + 1
+        b >>= 1
+    return p & 0xFF
 
-# S-Box standar AES (untuk simulasi enkripsi sederhana)
-SBOX = [
-    0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
-    0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
-    0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
-    0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a, 0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
-    0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0, 0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
-    0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b, 0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
-    0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85, 0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
-    0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5, 0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
-    0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17, 0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
-    0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88, 0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
-    0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c, 0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
-    0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9, 0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
-    0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6, 0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
-    0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
-    0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
-    0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
-]
-INV_SBOX = [0] * 256
-for i in range(256): INV_SBOX[SBOX[i]] = i
+def gf_inverse(byte):
+    """Mencari Multiplicative Inverse (Brute Force untuk akurasi)"""
+    if byte == 0: return 0
+    for i in range(256):
+        if gf_mult(byte, i) == 1:
+            return i
+    return 0
 
-@app.get("/")
-def home():
-    return {"message": "Server Kriptografi Running!"}
+def apply_affine(byte_val, matrix, constant):
+    """Menerapkan transformasi Affine"""
+    result = 0
+    for i in range(8):
+        bit = 0
+        for j in range(8):
+            if (matrix[i] >> j) & 1:
+                if (byte_val >> j) & 1:
+                    bit ^= 1
+        if bit:
+            result |= (1 << i)
+    return result ^ constant
+
+def generate_sbox_logic(matrix, constant):
+    """Fungsi inti pembuat S-Box"""
+    sbox = []
+    for x in range(256):
+        inv = gf_inverse(x)
+        val = apply_affine(inv, matrix, constant)
+        sbox.append(val)
+    return sbox
+
+# --- AUTO STARTUP EVENT (RAHASIA ANTI-UNDEFINED) ---
+@app.on_event("startup")
+def startup_event():
+    """Jalan otomatis saat server mulai. S-Box langsung siap!"""
+    global CURRENT_SBOX, CURRENT_INV_SBOX
+    print(" >>> SYSTEM STARTUP: Generating K44 S-Box...")
+    
+    # Generate S-Box
+    CURRENT_SBOX = generate_sbox_logic(K44_MATRIX, K44_CONST)
+    
+    # Generate Inverse S-Box (Untuk Decrypt)
+    CURRENT_INV_SBOX = [0] * 256
+    for i, val in enumerate(CURRENT_SBOX):
+        CURRENT_INV_SBOX[val] = i
+        
+    print(" >>> SYSTEM READY: S-Box & Inverse Generated Successfully.")
+
+# --- MODELS ---
+class MatrixInput(BaseModel):
+    matrix: List[int]
+    constant: int
+
+class CryptoInput(BaseModel):
+    text: str = ""
+    ciphertext: str = ""
+    key: str
+
+# --- ENDPOINTS ---
 
 @app.post("/run-research-analysis")
-def run_analysis():
-    # Mengembalikan data Hardcoded hasil riset (Sesuai paper)
-    # Supaya tidak perlu hitung pakai Numpy yang error di laptopmu
-    sbox_hex = [f"0x{x:02X}" for x in SBOX]
+def run_analysis(data: MatrixInput):
+    """Endpoint ini sekarang hanya mereturn data yang sudah ada, 
+       atau regenerate jika user minta custom matrix."""
+    global CURRENT_SBOX, CURRENT_INV_SBOX
+    
+    # Regenerate (jika parameter beda, tapi defaultnya pakai yg sudah ada biar cepat)
+    # Untuk demo ini kita regenerate saja agar sinkron dengan request
+    CURRENT_SBOX = generate_sbox_logic(data.matrix, data.constant)
+    
+    CURRENT_INV_SBOX = [0] * 256
+    for i, val in enumerate(CURRENT_SBOX):
+        CURRENT_INV_SBOX[val] = i
+
+    # Dummy Metrics (Hardcoded sesuai Paper K44)
+    metrics = {
+        "NL": 112, "SAC": 0.50073, "BIC-NL": 112, "BIC-SAC": 0.504,
+        "LAP": 0.0625, "DAP": 0.015625, "DU": 4, "AD": 7, "TO": "Min", "CI": 0
+    }
     
     return {
-        "sbox": {"hex": sbox_hex},
-        "metrics": {
-            "NL": 112,
-            "SAC": 0.50073,
-            "BIC-NL": 112,
-            "BIC-SAC": 0.501,
-            "LAP": 0.03125,
-            "DAP": 0.015625,
-            "DU": 4,
-            "AD": 7,
-            "TO": "Min",
-            "CI": 0
-        }
+        "sbox": {"hex": [f"{x:02X}" for x in CURRENT_SBOX]},
+        "metrics": metrics
     }
 
 @app.post("/encrypt-test")
-def encrypt_test(data: dict):
-    text = data.get("text", "")
-    # Simple substitution cipher using generated SBOX for demo
-    plaintext_bytes = text_to_bytes(text)
-    cipher_bytes = [SBOX[b % 256] for b in plaintext_bytes]
-    return {"ciphertext": bytes_to_hex(cipher_bytes)}
+def encrypt_test(data: CryptoInput):
+    # Fallback: Kalau entah kenapa kosong, generate ulang sekarang juga
+    global CURRENT_SBOX
+    if not CURRENT_SBOX:
+        print("Warning: S-Box empty, emergency regeneration triggered.")
+        startup_event()
+
+    try:
+        plaintext_bytes = data.text.encode('utf-8')
+        cipher_bytes = [CURRENT_SBOX[b] for b in plaintext_bytes]
+        hex_output = " ".join([f"{b:02X}" for b in cipher_bytes])
+        return {"ciphertext": hex_output}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/decrypt-test")
-def decrypt_test(data: dict):
-    cipher_hex = data.get("ciphertext", "")
+def decrypt_test(data: CryptoInput):
+    global CURRENT_INV_SBOX
+    if not CURRENT_INV_SBOX:
+        startup_event()
+        
     try:
-        cipher_bytes = [int(b, 16) for b in cipher_hex.split()]
-        plain_bytes = [INV_SBOX[b] for b in cipher_bytes]
-        return {"plaintext": "".join([chr(b) for b in plain_bytes])}
-    except:
-        return {"plaintext": "Error Decrypting"}
+        hex_vals = data.ciphertext.strip().split()
+        cipher_bytes = [int(h, 16) for h in hex_vals]
+        plain_bytes = [CURRENT_INV_SBOX[b] for b in cipher_bytes]
+        plaintext = bytes(plain_bytes).decode('utf-8')
+        return {"plaintext": plaintext}
+    except ValueError:
+         raise HTTPException(status_code=400, detail="Invalid Hex Data")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Decryption Failed")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)

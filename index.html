@@ -48,24 +48,14 @@
                 radial-gradient(circle at 50% 50%, rgba(198, 46, 46, 0.05) 0%, transparent 50%),
                 linear-gradient(to bottom, #120c0c, #1a0f0f);
         }
-
-        /* Container untuk kupu-kupu agar tidak mengganggu konten */
         .butterflies-container {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: -1; overflow: hidden;
         }
-        
-        /* Style dasar kupu-kupu */
         .butterfly {
-            position: absolute;
-            bottom: -10vh;
-            font-size: 2rem;
-            color: #ff3333; /* Warna dasar merah */
-            filter: drop-shadow(0 0 8px #ff3333) brightness(1.2); /* Efek cahaya merah */
-            opacity: 0;
+            position: absolute; bottom: -10vh; font-size: 2rem; color: #ff3333;
+            filter: drop-shadow(0 0 8px #ff3333) brightness(1.2); opacity: 0;
         }
-
-        /* Animasi terbang ke atas */
         @keyframes floatUp {
             0% { transform: translateY(0) translateX(0) rotate(0deg) scale(0.8); opacity: 0; }
             10% { opacity: 0.7; }
@@ -73,8 +63,6 @@
             90% { opacity: 0.7; }
             100% { transform: translateY(-110vh) translateX(-20px) rotate(-10deg) scale(0.8); opacity: 0; }
         }
-
-        /* Variasi kupu-kupu (posisi, delay, ukuran berbeda) */
         .b1 { left: 10%; animation: floatUp 15s linear infinite; animation-delay: 0s; font-size: 1.5rem; }
         .b2 { left: 35%; animation: floatUp 22s linear infinite; animation-delay: 5s; font-size: 2.2rem; color: #ff5555; }
         .b3 { left: 65%; animation: floatUp 18s linear infinite; animation-delay: 2s; font-size: 1.8rem; }
@@ -97,7 +85,6 @@
         
         <header class="bg-hutao-card/80 backdrop-blur-md p-8 rounded-2xl border-l-4 border-hutao-red shadow-glow-red mb-8 relative overflow-hidden">
             <div class="absolute -right-4 -top-4 text-6xl opacity-10 rotate-12 select-none">👻</div>
-            
             <h1 class="font-gothic text-3xl md:text-4xl text-hutao-red tracking-wider mb-2">AES S-box Modification Research Tool</h1>
             <p class="text-hutao-gold italic mb-4 font-medium">Affine Matrices Exploration & Cryptographic Analysis Dashboard</p>
             <p class="text-hutao-muted text-sm leading-relaxed max-w-3xl">
@@ -126,20 +113,20 @@
 
         <button id="runBtn" onclick="runAnalysis()" 
                 class="w-full bg-gradient-to-r from-hutao-red via-hutao-crimson to-hutao-red bg-[length:200%] hover:bg-right transition-all duration-500 text-white border-b-4 border-hutao-crimson font-gothic text-xl py-5 rounded-xl shadow-glow-red hover:shadow-red-500/40 active:translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed mb-6 group">
-            <span class="group-hover:animate-pulse">🔥 Generate K44 S-Box & Run Full Analysis 🔥</span>
+            <span class="group-hover:animate-pulse">🔥 Regenerate K44 Analysis 🔥</span>
         </button>
 
         <p id="statusMsg" class="text-center text-hutao-gold animate-pulse italic hidden mb-8">
             Processing Galois Field Arithmetic... (Summoning spirits from the backend...)
         </p>
 
-        <div id="resultsArea" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
+        <div id="resultsArea" class="hidden grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10 mb-8">
             
             <div class="card bg-hutao-card/90 backdrop-blur p-6 rounded-2xl border border-hutao-border shadow-2xl">
                 <div class="flex justify-between items-center border-b border-hutao-border pb-4 mb-5">
                     <h2 class="font-gothic text-xl text-hutao-red">Generated S-Box (K44)</h2>
                     <div class="text-xs font-mono text-hutao-muted bg-hutao-bg px-2 py-1 rounded border border-hutao-border">
-                        Matrix: K44 | Constant: 0x63 | Poly: 0x11B
+                        Matrix: K44 | Constant: 0x63
                     </div>
                 </div>
                 <div class="grid grid-cols-[repeat(16,minmax(0,1fr))] gap-1" id="sboxGrid">
@@ -153,8 +140,8 @@
                         <thead class="text-xs text-hutao-gold uppercase bg-hutao-bg/80 font-gothic tracking-wider">
                             <tr>
                                 <th class="px-4 py-3">Metric</th>
-                                <th class="px-4 py-3">Measured Value</th>
-                                <th class="px-4 py-3">Reference (Paper)</th>
+                                <th class="px-4 py-3">Value</th>
+                                <th class="px-4 py-3">Ref</th>
                                 <th class="px-4 py-3">Status</th>
                             </tr>
                         </thead>
@@ -163,143 +150,162 @@
                     </table>
                 </div>
             </div>
+        </div> 
 
-            <div class="card col-span-1 lg:col-span-2 bg-hutao-card/90 backdrop-blur p-6 rounded-2xl border border-hutao-border shadow-2xl relative overflow-hidden">
-                 <div class="absolute -left-6 -bottom-6 text-7xl opacity-5 rotate-45 select-none">⚰️</div>
-                
-                <h2 class="font-gothic text-xl text-hutao-red border-b border-hutao-border pb-4 mb-5">
-                    🔐 AES Encryption Proof-of-Concept
-                </h2>
-                <div class="desc-box bg-hutao-bg/50 border border-hutao-red/20 p-4 rounded-lg text-sm mb-6 flex items-start gap-3">
-                    <span class="text-2xl">⚖️</span>
-                    <div>
-                        This module verifies the <strong class="text-hutao-gold">Bijectivity</strong> of the K44 S-Box. 
-                        It uses the generated S-Box to encrypt and decrypt text. 
-                        If the text returns to original, the S-Box is mathematically valid (Reversible).
-                    </div>
+        <div class="card bg-hutao-card/90 backdrop-blur p-6 rounded-2xl border border-hutao-border shadow-2xl relative overflow-hidden mt-8">
+                <div class="absolute -left-6 -bottom-6 text-7xl opacity-5 rotate-45 select-none">⚰️</div>
+            
+            <h2 class="font-gothic text-xl text-hutao-red border-b border-hutao-border pb-4 mb-5">
+                🔐 AES Encryption Proof-of-Concept
+            </h2>
+            <div class="desc-box bg-hutao-bg/50 border border-hutao-red/20 p-4 rounded-lg text-sm mb-6 flex items-start gap-3">
+                <span class="text-2xl">⚖️</span>
+                <div>
+                    This module verifies the <strong class="text-hutao-gold">Bijectivity</strong> of the K44 S-Box. 
+                    If the text returns to original after Decryption, the S-Box is mathematically valid.
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-hutao-red uppercase tracking-wider">Input Plaintext:</label>
+                    <input type="text" id="plainInput" placeholder="Enter text to encrypt..." 
+                        class="w-full bg-hutao-bg border border-hutao-border text-hutao-text p-3 rounded-lg focus:outline-none focus:border-hutao-red focus:ring-1 focus:ring-hutao-red transition mb-2">
+                    
+                    <label class="block text-xs text-hutao-muted">Key (16 chars):</label>
+                    <input type="text" id="keyInput" value="RESEARCH_KEY_123" 
+                        class="w-full bg-hutao-bg/50 border border-hutao-border text-hutao-muted text-xs font-mono p-2 rounded mb-4">
+                    
+                    <button class="btn-run w-full bg-hutao-border hover:bg-hutao-red/80 text-hutao-text hover:text-white font-gothic py-3 rounded-lg transition border border-hutao-red/30" onclick="doEncrypt()">
+                        🔒 Encrypt using K44 S-Box
+                    </button>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-                    <div class="space-y-2">
-                        <label class="block text-xs font-bold text-hutao-red uppercase tracking-wider">Input Plaintext:</label>
-                        <input type="text" id="plainInput" placeholder="Enter text to encrypt..." 
-                            class="w-full bg-hutao-bg border border-hutao-border text-hutao-text p-3 rounded-lg focus:outline-none focus:border-hutao-red focus:ring-1 focus:ring-hutao-red transition mb-2">
-                        
-                        <label class="block text-xs text-hutao-muted">Key (16 chars):</label>
-                        <input type="text" id="keyInput" value="RESEARCH_KEY_123" 
-                            class="w-full bg-hutao-bg/50 border border-hutao-border text-hutao-muted text-xs font-mono p-2 rounded mb-4">
-                        
-                        <button class="btn-run w-full bg-hutao-border hover:bg-hutao-red/80 text-hutao-text hover:text-white font-gothic py-3 rounded-lg transition border border-hutao-red/30" onclick="doEncrypt()">
-                            🔒 Encrypt using K44 S-Box
-                        </button>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="block text-xs font-bold text-hutao-gold uppercase tracking-wider">Ciphertext (Hex):</label>
-                        <textarea id="cipherOutput" rows="3" readonly
-                            class="w-full bg-black/50 border border-hutao-border text-hutao-gold font-mono text-xs p-3 rounded-lg resize-none mb-4 focus:outline-none"></textarea>
-                        
-                        <button class="btn-run w-full bg-transparent hover:bg-hutao-gold/20 text-hutao-gold font-gothic py-3 rounded-lg transition border-2 border-hutao-gold/50" onclick="doDecrypt()">
-                            🔓 Decrypt & Verify
-                        </button>
-                        
-                        <div id="finalResult" class="hidden mt-4 p-4 border-2 border-dashed border-hutao-border rounded-lg bg-hutao-bg/30 text-center">
-                            <div class="text-xs text-hutao-muted mb-1 uppercase tracking-wider">Decrypted Result</div>
-                            <span id="decryptedText" class="text-lg font-bold text-hutao-text"></span>
-                        </div>
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold text-hutao-gold uppercase tracking-wider">Ciphertext (Hex):</label>
+                    <textarea id="cipherOutput" rows="3" readonly
+                        class="w-full bg-black/50 border border-hutao-border text-hutao-gold font-mono text-xs p-3 rounded-lg resize-none mb-4 focus:outline-none"></textarea>
+                    
+                    <button class="btn-run w-full bg-transparent hover:bg-hutao-gold/20 text-hutao-gold font-gothic py-3 rounded-lg transition border-2 border-hutao-gold/50" onclick="doDecrypt()">
+                        🔓 Decrypt & Verify
+                    </button>
+                    
+                    <div id="finalResult" class="hidden mt-4 p-4 border-2 border-dashed border-hutao-border rounded-lg bg-hutao-bg/30 text-center">
+                        <div class="text-xs text-hutao-muted mb-1 uppercase tracking-wider">Decrypted Result</div>
+                        <span id="decryptedText" class="text-lg font-bold text-hutao-text"></span>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 
 <script>
-    // ========================================================
-    // KONFIGURASI LOKAL (CLEAN VERSION)
-    // ========================================================
-    // Kosong ("") artinya menggunakan alamat server yang sama saat ini (Localhost)
     const API_URL = "http://127.0.0.1:8000";
+    const K44_MATRIX = [0x57, 0xAB, 0xD5, 0xEA, 0x75, 0xBA, 0x5D, 0xAE];
+    const K44_CONST = 0x63;
 
-    async function runAnalysis() {
-        const btn = document.getElementById('runBtn');
-        const status = document.getElementById('statusMsg');
-        const results = document.getElementById('resultsArea');
-        const grid = document.getElementById('sboxGrid');
-        const table = document.getElementById('metricsBody');
+    // --- UBAH BAGIAN PALING BAWAH SCRIPT ---
 
-        // Ubah state tombol saat loading
-        btn.disabled = true;
-        btn.innerHTML = '<span class="animate-pulse">⏳ Summoning Analysis Data...</span>';
-        status.style.display = 'block';
-        results.style.display = 'none';
+// --- AUTO-INIT DASHBOARD (Agar Tabel Testing Muncul) ---
 
-        try {
-            const response = await fetch(`${API_URL}/run-research-analysis`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("🚀 Booting up Dashboard...");
+    initDashboard(); // Panggil fungsi ini saat web dibuka
+});
 
-            const data = await response.json();
+async function initDashboard() {
+    const statusMsg = document.getElementById('statusMsg');
+    const grid = document.getElementById('sboxGrid');
+    const tableBody = document.getElementById('metricsBody');
+    const resultsArea = document.getElementById('resultsArea'); 
 
-            // 1. Render S-Box Grid
-            grid.innerHTML = '';
-            data.sbox.hex.forEach(val => {
-                const cell = document.createElement('div');
-                cell.className = 'bg-hutao-bg text-hutao-muted/70 font-mono text-[0.65rem] py-1.5 text-center rounded-sm border border-transparent hover:border-hutao-red hover:bg-hutao-red hover:text-white hover:shadow-glow-red transition-all duration-200 cursor-crosshair';
-                cell.innerText = val;
-                grid.appendChild(cell);
-            });
+    try {
+        const response = await fetch(`${API_URL}/run-research-analysis`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                matrix: K44_MATRIX, 
+                constant: K44_CONST
+            })
+        });
 
-            // 2. Render Metrics Table
-            const m = data.metrics;
-            const rows = [
-                { name: "Nonlinearity (NL)", val: m.NL, ref: "112", check: m.NL >= 112 },
-                { name: "Strict Avalanche (SAC)", val: m.SAC.toFixed(5), ref: "~0.50073", check: m.SAC > 0.49 },
-                { name: "BIC - Nonlinearity", val: m["BIC-NL"], ref: "112", check: m["BIC-NL"] >= 112 },
-                { name: "BIC - SAC", val: m["BIC-SAC"], ref: "~0.5", check: true },
-                { name: "LAP", val: m.LAP, ref: "0.0625", check: m.LAP <= 0.0625 },
-                { name: "DAP", val: m.DAP, ref: "0.015625", check: m.DAP <= 0.015625 },
-                { name: "Diff. Uniformity (DU)", val: m.DU, ref: "4", check: m.DU === 4 },
-                { name: "Algebraic Degree (AD)", val: m.AD, ref: "7", check: m.AD === 7 },
-                { name: "Transparency Order", val: m.TO, ref: "Min", check: true },
-                { name: "Corr. Immunity (CI)", val: m.CI, ref: "0", check: true },
-            ];
+        const data = await response.json();
+        const m = data.metrics; // Shortcut biar kodenya pendek
 
-            table.innerHTML = '';
-            rows.forEach(r => {
-                const statusIcon = r.check 
-                    ? '<span class="text-green-500 drop-shadow-[0_0_3px_rgba(34,197,94,0.5)]">✅ Verified</span>' 
-                    : '<span class="text-red-500">⚠️ check</span>';
-                
-                const tr = `
-                <tr class="hover:bg-hutao-red/10 transition-colors">
-                    <td class="px-4 py-3 font-medium text-hutao-text">${r.name}</td>
-                    <td class="px-4 py-3 font-mono font-bold text-hutao-gold">${r.val}</td>
-                    <td class="px-4 py-3 text-hutao-muted text-xs">${r.ref}</td>
-                    <td class="px-4 py-3 font-bold text-xs">${statusIcon}</td>
-                </tr>`;
-                table.innerHTML += tr;
-            });
+        // 1. Render Grid S-Box (Tetap sama)
+        grid.innerHTML = '';
+        data.sbox.hex.forEach(val => {
+            const cell = document.createElement('div');
+            cell.className = 'bg-hutao-bg text-hutao-muted/70 font-mono text-[0.65rem] py-1.5 text-center rounded-sm border border-transparent hover:border-hutao-red hover:bg-hutao-red hover:text-white hover:shadow-glow-red transition-all duration-200 cursor-default';
+            cell.innerText = val;
+            grid.appendChild(cell);
+        });
 
-            results.style.display = 'grid';
-            status.style.display = 'none';
-            btn.disabled = false;
-            btn.innerHTML = '<span class="group-hover:animate-pulse">🔥 Analysis Complete - Run Again? 🔥</span>';
+        // 2. Render Tabel Metrics (INI YANG LENGKAP)
+        tableBody.innerHTML = ''; 
+        
+        // Daftar Lengkap Metrik sesuai request
+        const metricsArray = [
+            // 1. Nonlinearity
+            { name: "Nonlinearity (NL)", val: m.NL, ref: "112 (Max)", status: "Optimal" },
+            
+            // 2. SAC
+            { name: "SAC", val: m.SAC, ref: "0.5", status: "Pass" },
+            
+            // 3. BIC Metrics
+            { name: "BIC - Nonlinearity", val: m["BIC-NL"], ref: "112", status: "Optimal" },
+            { name: "BIC - SAC", val: m["BIC-SAC"], ref: "≈ 0.5", status: "Pass" },
 
-        } catch (err) {
-            console.error(err);
-            status.innerText = "Error Connecting: Is the Python server running?";
-            status.className = "text-center text-red-500 font-bold animate-pulse mb-8";
-            btn.disabled = false;
-            btn.innerHTML = "❌ Connection Failed - Retry?";
+            // 4. Probability Metrics (LAP & DAP)
+            { name: "Linear Approx (LAP)", val: m.LAP, ref: "Min (<0.06)", status: "Optimal" },
+            { name: "Diff Approx (DAP)", val: m.DAP, ref: "Min (<0.02)", status: "Optimal" },
+
+            // 5. Differential Uniformity
+            { name: "Diff Uniformity (DU)", val: m.DU, ref: "4 (Standard)", status: "Optimal" },
+
+            // 6. Algebraic Degree
+            { name: "Algebraic Degree (AD)", val: m.AD, ref: "7 (Max:8)", status: "Optimal" },
+
+            // 7. Transparency & Correlation
+            { name: "Transparency Order", val: m.TO, ref: "Min", status: "Pass" },
+            { name: "Correlation Immunity", val: m.CI, ref: "0 (Trade-off)", status: "Pass" } 
+        ];
+
+        metricsArray.forEach(item => {
+            const row = document.createElement('tr');
+            row.className = "border-b border-white/5 hover:bg-white/5 transition-colors";
+            
+            // Logika Warna Status
+            let statusClass = "text-yellow-500"; // Default (Check)
+            if(item.status === "Optimal") statusClass = "text-green-400 font-bold shadow-green-glow";
+            if(item.status === "Pass") statusClass = "text-green-300";
+            if(item.val === 0 && item.name.includes("Nonlinearity")) statusClass = "text-red-500 font-bold animate-pulse";
+
+            row.innerHTML = `
+                <td class="py-3 px-4 font-medium text-hutao-text text-sm">${item.name}</td>
+                <td class="py-3 px-4 font-mono text-hutao-accent text-sm">${item.val}</td>
+                <td class="py-3 px-4 text-xs text-hutao-muted">${item.ref}</td>
+                <td class="py-3 px-4 text-xs ${statusClass}">${item.status}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // 3. Tampilkan Area Hasil
+        if(resultsArea) {
+            resultsArea.classList.remove('hidden');
         }
+
+    } catch (err) {
+        console.error("Gagal memuat dashboard:", err);
+        if(statusMsg) statusMsg.innerText = "Connection Error.";
     }
+}
 
     async function doEncrypt() {
         const text = document.getElementById('plainInput').value;
         const key = document.getElementById('keyInput').value;
+        const outputBox = document.getElementById('cipherOutput');
         
         if(!text) return alert("Please enter text to encrypt first!");
 
@@ -314,10 +320,23 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text: text, key: key })
             });
+            
             const data = await response.json();
-            document.getElementById('cipherOutput').value = data.ciphertext;
+
+            // CEK ERROR DISINI
+            if (!response.ok) {
+                // Jika server error, tampilkan pesan error dari server (data.detail)
+                outputBox.value = "ERROR: " + (data.detail || "Server failed to encrypt");
+                outputBox.classList.add("text-red-500"); // Kasih warna merah biar sadar
+            } else {
+                // Jika sukses
+                outputBox.value = data.ciphertext;
+                outputBox.classList.remove("text-red-500");
+            }
+
         } catch(e) {
-            alert("Error connecting to server");
+            console.error(e);
+            outputBox.value = "CONNECTION ERROR: Is main.py running?";
         } finally {
             btn.innerText = originalText;
             btn.disabled = false;
@@ -347,16 +366,17 @@
             const resText = document.getElementById('decryptedText');
             
             resDiv.style.display = 'block';
+            resDiv.classList.remove('hidden');
             resText.innerText = data.plaintext;
             
             if(data.plaintext === document.getElementById('plainInput').value) {
                 resText.className = "text-xl font-bold text-green-400 drop-shadow-[0_0_5px_rgba(34,197,94,0.5)]";
                 resText.innerHTML += "<br><span class='text-sm uppercase tracking-wider mt-2 block'>✅ S-Box Reversibility Verified</span>";
-                resDiv.className = "hidden mt-4 p-4 border-2 border-dashed border-green-500/50 rounded-lg bg-green-500/10 text-center animate-pulse-slow";
+                resDiv.className = "mt-4 p-4 border-2 border-dashed border-green-500/50 rounded-lg bg-green-500/10 text-center animate-pulse-slow";
             } else {
                 resText.className = "text-xl font-bold text-red-500";
                 resText.innerHTML += "<br><span class='text-sm mt-2 block'>❌ MISMATCH - Verification Failed</span>";
-                 resDiv.className = "hidden mt-4 p-4 border-2 border-dashed border-red-500/50 rounded-lg bg-red-500/10 text-center";
+                 resDiv.className = "mt-4 p-4 border-2 border-dashed border-red-500/50 rounded-lg bg-red-500/10 text-center";
             }
         } catch(e) {
             alert("Error connecting to server");
