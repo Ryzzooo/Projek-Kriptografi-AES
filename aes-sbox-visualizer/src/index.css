@@ -1,0 +1,213 @@
+@import "tailwindcss";
+
+/* Neo Brutalism Design System */
+@theme {
+  /* Colors */
+  --color-cream: #FFFEF0;
+  --color-cream-dark: #E8E4D9;
+  --color-ink: #1A1A1A;
+  --color-red: #FF5757;
+  --color-blue: #5CE1E6;
+  --color-yellow: #FFDE59;
+  --color-purple: #CB6CE6;
+  --color-green: #7ED957;
+  --color-orange: #FF914D;
+
+  /* Shadows - Neo Brutalism hard offset shadows */
+  --shadow-brutal-sm: 2px 2px 0 var(--color-ink);
+  --shadow-brutal: 4px 4px 0 var(--color-ink);
+  --shadow-brutal-lg: 6px 6px 0 var(--color-ink);
+
+  /* Border radius - minimal for brutalism */
+  --radius-brutal: 0px;
+  --radius-sm: 4px;
+
+  /* Fonts */
+  --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-display);
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Neo Brutalism utility classes */
+.brutal-border {
+  border: 2px solid var(--color-ink);
+}
+
+.brutal-border-thick {
+  border: 3px solid var(--color-ink);
+}
+
+.brutal-shadow {
+  box-shadow: var(--shadow-brutal);
+}
+
+.brutal-shadow-sm {
+  box-shadow: var(--shadow-brutal-sm);
+}
+
+.brutal-shadow-lg {
+  box-shadow: var(--shadow-brutal-lg);
+}
+
+/* Button hover effect - move shadow */
+.brutal-btn {
+  border: 2px solid var(--color-ink);
+  box-shadow: var(--shadow-brutal);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  cursor: pointer;
+}
+
+.brutal-btn:hover {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--color-ink);
+}
+
+.brutal-btn:active {
+  transform: translate(4px, 4px);
+  box-shadow: none;
+}
+
+/* Card component */
+.brutal-card {
+  border: 2px solid var(--color-ink);
+  box-shadow: var(--shadow-brutal);
+  background-color: white;
+}
+
+/* Input styling */
+.brutal-input {
+  border: 2px solid var(--color-ink);
+  background-color: white;
+  padding: 0.5rem 1rem;
+  font-family: var(--font-mono);
+  outline: none;
+}
+
+.brutal-input:focus {
+  box-shadow: var(--shadow-brutal-sm);
+}
+
+/* Grid cell for matrix/sbox display */
+.grid-cell {
+  border: 1px solid var(--color-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  transition: all 0.1s ease;
+}
+
+.grid-cell:hover {
+  background-color: var(--color-yellow);
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+/* Toggle cell for matrix */
+.toggle-cell {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--color-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  transition: all 0.1s ease;
+  user-select: none;
+}
+
+.toggle-cell.active {
+  background-color: var(--color-yellow);
+}
+
+.toggle-cell.inactive {
+  background-color: var(--color-cream);
+}
+
+.toggle-cell:hover {
+  box-shadow: var(--shadow-brutal-sm);
+  transform: translate(-1px, -1px);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-cream-dark);
+  border: 2px solid var(--color-ink);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-ink);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #333;
+}
+
+/* Code/hex display */
+.hex-display {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+}
+
+/* Section titles */
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-bottom: 3px solid var(--color-ink);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Badge/tag styling */
+.brutal-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border: 2px solid var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Animation keyframes */
+@keyframes pulse-brutal {
+  0%, 100% {
+    box-shadow: var(--shadow-brutal);
+  }
+  50% {
+    box-shadow: var(--shadow-brutal-lg);
+  }
+}
+
+.animate-pulse-brutal {
+  animation: pulse-brutal 2s ease-in-out infinite;
+}
